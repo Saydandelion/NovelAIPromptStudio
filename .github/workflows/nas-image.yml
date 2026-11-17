@@ -46,9 +46,25 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Save image for local import
+      - name: Smoke test
         run: |
           docker pull ${{ steps.meta.outputs.name }}:latest
+          mkdir -p /tmp/studio/data /tmp/studio/output
+          docker run -d --name smoke -p 8960:8960 \
+            -e STUDIO_PASSWORD=smoke -e STUDIO_ARCHIVE=/output \
+            -v /tmp/studio/data:/data -v /tmp/studio/output:/output \
+            ${{ steps.meta.outputs.name }}:latest
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8960/api/health && break; sleep 2; done
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8960/)" = 401
+          curl -fs -u x:smoke http://127.0.0.1:8960/ | grep -q 'NovelAI Prompt Studio'
+          curl -fs -u x:smoke -X POST -H 'X-Studio: 1' -H 'Content-Type: application/json' \
+            -d '{"name":"workbench.session","input":{}}' http://127.0.0.1:8960/api/invoke | grep -q '"ok":true'
+          test -f /tmp/studio/data/data/studio.sqlite
+          docker logs smoke
+          docker rm -f smoke
+
+      - name: Save image for local import
+        run: |
           docker tag ${{ steps.meta.outputs.name }}:latest nai-studio:latest
           docker save nai-studio:latest | gzip > nai-studio-amd64.tar.gz
           ls -lh nai-studio-amd64.tar.gz
