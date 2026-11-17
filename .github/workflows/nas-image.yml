@@ -1,7 +1,7 @@
 # 服务器版 Docker 镜像：推送 nas-web 分支或 nas-v* 标签时构建
 # 产物：
 #   1. ghcr.io/<你的用户名>/nai-studio:latest（以及按提交区分的标签）
-#   2. 一个可以下载的镜像包 nai-studio-amd64.tar.gz，极空间 Docker 里可以"本地导入"
+#   2. 一个可以下载的镜像包 nai-studio-amd64.tar（下载得到 zip，解压即可），极空间 Docker 里可以"本地导入"
 name: NAS image
 
 on:
@@ -66,12 +66,11 @@ jobs:
       - name: Save image for local import
         run: |
           docker tag ${{ steps.meta.outputs.name }}:latest nai-studio:latest
-          docker save nai-studio:latest | gzip > nai-studio-amd64.tar.gz
-          ls -lh nai-studio-amd64.tar.gz
+          docker save -o nai-studio-amd64.tar nai-studio:latest
+          ls -lh nai-studio-amd64.tar
 
       - uses: actions/upload-artifact@v4
         with:
           name: nai-studio-amd64
-          path: nai-studio-amd64.tar.gz
+          path: nai-studio-amd64.tar
           retention-days: 14
-          compression-level: 0

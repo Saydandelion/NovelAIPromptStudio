@@ -12,13 +12,13 @@
 1. 在 GitHub 上 fork 本仓库，推送 `nas-web` 分支（或在 Actions 页手动运行 "NAS image"）。
 2. 构建完成后有两种产物：
    - 镜像 `ghcr.io/<你的用户名>/nai-studio:latest`。第一次构建后，到 GitHub 个人主页 → Packages → nai-studio → Package settings，把可见性改成 Public，NAS 才能免登录拉取。
-   - 这次运行页面底部的 Artifacts 里有 `nai-studio-amd64`，下载解压后得到 `nai-studio-amd64.tar.gz`。**国内拉不动 ghcr.io 时用这个**：极空间 Docker → 镜像 → 添加 → 本地导入。
+   - 这次运行页面底部的 Artifacts 里有 `nai-studio-amd64`，下载的 zip 解压后得到 `nai-studio-amd64.tar`。**国内拉不动 ghcr.io 时用这个**：极空间 Docker → 镜像 → 添加 → 本地导入。
 
 **B. 在自己电脑上构建**（电脑要装 Docker）
 ```bash
 docker build -t nai-studio:latest .
 # 国内可加：--build-arg NPM_REGISTRY=https://registry.npmmirror.com
-docker save nai-studio:latest | gzip > nai-studio-amd64.tar.gz
+docker save -o nai-studio-amd64.tar nai-studio:latest
 ```
 然后同样用"本地导入"传到极空间。
 
