@@ -1,0 +1,20 @@
+# NovelAI Prompt Studio 服务器版：极空间 Docker → Compose → 新建项目，粘贴后改下面标了"改"的地方
+services:
+  nai-studio:
+    # 用 GitHub 构建的镜像：ghcr.io/<你的 GitHub 用户名>/nai-studio:latest
+    # 用本地导入的镜像包：nai-studio:latest
+    image: nai-studio:latest # 改
+    container_name: nai-studio
+    restart: unless-stopped
+    ports:
+      - "8960:8960"
+    environment:
+      STUDIO_PASSWORD: "换成你的访问密码" # 改：浏览器登录时用户名随便填，密码填这个
+      STUDIO_IMPORT: /import
+      STUDIO_ARCHIVE: /output
+      TZ: Asia/Shanghai
+    volumes:
+      # 冒号左边换成极空间上的真实文件夹路径（在极空间 Docker 的"文件夹路径"里选好后能看到）
+      - /你的路径/AI绘图/studio-data:/data # 改：程序数据（数据库、图库、备份），要定期备份
+      - /你的路径/AI绘图/生成:/output # 改：自动归档，每张生成图复制一份到这里
+      - /你的路径/AI绘图/老图:/import:ro # 改：要导入的老图（可选，不需要就删掉这一行）

@@ -28,3 +28,7 @@ design/structure.html
 design/identity/source/
 design/identity/tokens/
 design/identity/guidelines.pdf
+
+# 服务器版
+dist-web/
+studio-data/
