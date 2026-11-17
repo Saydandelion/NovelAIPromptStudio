@@ -1,4 +1,16 @@
 // 服务器版的浏览器入口：用 HTTP + SSE 提供桌面版 preload 里的 window.studio
+
+// 用 http://局域网IP 打开时浏览器不算安全上下文，没有 crypto.randomUUID（界面里很多地方用它生成 ID）。
+// getRandomValues 不受限制，用它按 RFC 4122 v4 补上。
+if (typeof crypto.randomUUID !== 'function') {
+  crypto.randomUUID = () => {
+    const b = crypto.getRandomValues(new Uint8Array(16));
+    b[6] = (b[6] & 0x0f) | 0x40;
+    b[8] = (b[8] & 0x3f) | 0x80;
+    const h = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+    return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+  };
+}
 const events = new Set(),
   preparations = new Set(),
   uploads = new Map();
